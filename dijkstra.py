@@ -42,15 +42,15 @@ class Graph():
 
         return lowest_key  # must be string
 
-    # @property
-    # def count_of_objects(self):
-    #     return len(self.__nodes) + 1
+    @property
+    def count_of_objects(self):
+        return len(self.__nodes) + 1
 
 
 
 def dijkstra(start, *other):
 
-    nodes_object = LowestDistanceNode(start, other)
+    nodes_object = Graph(start, other)
     while len(nodes_object.visited_nodes) != nodes_object.count_of_objects:
         for g in other:
             if g.id == nodes_object.lowest_distance:
