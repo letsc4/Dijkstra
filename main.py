@@ -3,19 +3,26 @@ import dijkstra
 
 
 def main():
-    a_relations = {"b": 7, "c": 9, "f": 14}
-    b_relations = {"a": 7, "c": 10, "d": 15}
-    c_relations = {"a": 9, "b": 10, "f": 2, "d": 11}
-    d_relations = {"b": 15, "c": 11, "e": 6}
-    e_relations = {"d": 6, "f": 9}
-    f_relations = {"a": 14, "c": 2, "e": 9}
+    a = points.Node("a")
+    b = points.Node("b")
+    c = points.Node("c")
+    d = points.Node("d")
+    e = points.Node("e")
+    f = points.Node("f")
 
-    a = points.Point("a", a_relations)
-    b = points.Point("b", b_relations)
-    c = points.Point("c", c_relations)
-    d = points.Point("d", d_relations)
-    e = points.Point("e", e_relations)
-    f = points.Point("f", f_relations)
+    a_relations = {b: 7, c: 9, f: 14}
+    b_relations = {a: 7, c: 10, d: 15}
+    c_relations = {a: 9, b: 10, f: 2, d: 11}
+    d_relations = {a: 15, c: 11, e: 6}
+    e_relations = {d: 6, f: 9}
+    f_relations = {a: 14, c: 2, e: 9}
+
+    a.relations = a_relations
+    b.relations = b_relations
+    c.relations = c_relations
+    d.relations = d_relations
+    e.relations = e_relations
+    f.relations = f_relations
 
     print(a, a.relations)
     print(b, b.relations)

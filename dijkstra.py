@@ -1,11 +1,14 @@
-class LowestDistanceNode():
+class Graph():
+
     def __init__(self, start_node, nodes):
-        self.__start_node = start_node
         self.__nodes = nodes
+
+        self.node_distances = {start_node: {}}
+        for i in nodes:
+            self.node_distances.update({i: {}})
+
+        self.priority_queue_nodes = {}
         self._visited_nodes = []
-        self.visited_nodes = start_node
-        self._node_distances = {}
-        self.node_distances = nodes
 
     @property
     def visited_nodes(self):
@@ -14,64 +17,66 @@ class LowestDistanceNode():
     @visited_nodes.setter
     def visited_nodes(self, node):
         self._visited_nodes.append(node)
+        self.update_priority_queue_nodes()
 
-    @property
-    def node_distances(self):
-        return self._node_distances
-
-    @node_distances.setter
-    def node_distances(self, nodes):
-        if isinstance(nodes, tuple):  # if node is tuple of nodes; for initalization
-            for i in nodes:
-                self._node_distances.update(
-                    {i.id: None})  # CHANGE NONE TO WORK
-            for o in self.__start_node.relations:
-                self._node_distances.update(
-                    {o: self.__start_node.relations[o]})
-        else:  # if node is point object
-            add_onto = self.__add_onto(nodes)
-
-            # update values of visited notes with logic(dont update key when value higher)
-            for neighbour in nodes.relations:
-
-                if neighbour == self.__start_node.id:
-                    continue
-                elif self._node_distances[neighbour] == None:
-                    self._node_distances.update(
-                        {neighbour: nodes.relations[neighbour] + add_onto})
-                elif nodes.relations[neighbour] + add_onto < self._node_distances[neighbour]:
-                    self._node_distances.update(
-                        {neighbour: nodes.relations[neighbour] + add_onto})
-
-            self._visited_nodes.append(nodes)
-
-    def __add_onto(self, node):
-        return self._node_distances[node.id]
-
-    @property
-    def lowest_distance(self):
-        lowest_key = None
-        for k in self._node_distances:
-            if k in self._visited_nodes or self._node_distances[k] == None:
+    def update_priority_queue_nodes(self):
+        # lowest value first to get out
+        if self.priority_queue_nodes:
+            self.priority_queue_nodes.popitem()
+        for node_id in self.node_distances:
+            if node_id in self._visited_nodes:
                 continue
-            elif lowest_key == None:
-                lowest_key = k
-            elif self._node_distances[k] < self._node_distances[lowest_key]:
-                lowest_key = k
+            sum_of_values = self.add_onto(node_id)
+            if sum_of_values:
+                self.priority_queue_nodes.update({node_id: sum_of_values})
+        # sorting by value
+        self.priority_queue_nodes = {key: value for key, value in sorted(
+            self.priority_queue_nodes.items(), key=lambda item: item[1], reverse=True)}
 
-        return lowest_key  # must be string
+    def add_onto(self, node_id):
+        """Returns sum of values of a node in node_distances
+
+        Args:
+            node_id (<class 'points.Node'>): _description_
+
+        Returns:
+            int: _description_
+        """
+        return sum(self.node_distances[node_id].values())
 
     @property
     def count_of_objects(self):
         return len(self.__nodes) + 1
 
 
-def dijkstra(start, *other):
+def dijkstra(start, *nodes):
 
-    nodes_object = LowestDistanceNode(start, other)
+    nodes_object = Graph(start, nodes)
+    for j in start.relations:
+        nodes_object.node_distances[j].update(
+            {start: start.relations[j]})
+    nodes_object.visited_nodes = start
+
     while len(nodes_object.visited_nodes) != nodes_object.count_of_objects:
-        for g in other:
-            if g.id == nodes_object.lowest_distance:
-                nodes_object.node_distances = g
+        for node in nodes:
+            # choosing node that has highest priority(lowest distance) and that is also not already visited
+            if nodes_object.priority_queue_nodes and node == list(nodes_object.priority_queue_nodes)[-1]:
+                for neighbour in node.relations:
+                    add_on = nodes_object.add_onto(neighbour)
+                    if neighbour == start:
+                        continue
+                    elif nodes_object.node_distances[neighbour] == {}:
+                        nodes_object.node_distances[neighbour].update(
+                            nodes_object.node_distances[node])
+                        nodes_object.node_distances[neighbour].update(
+                            {node: node.relations[neighbour]})
+                    # if total distance to current neighbour of current node is lower than distance to current neighbour of previous node
+                    elif node.relations[neighbour] + nodes_object.add_onto(node) < add_on:
+                        nodes_object.node_distances[neighbour].clear()
+                        nodes_object.node_distances[neighbour].update(
+                            nodes_object.node_distances[node])
+                        nodes_object.node_distances[neighbour].update(
+                            {node: node.relations[neighbour]})
+                nodes_object.visited_nodes = node
 
     print(nodes_object.node_distances)
