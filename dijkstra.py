@@ -1,82 +1,82 @@
+from priority_queue import PriorityQueue
+
+
 class Graph():
+    """class to put the nodes into
+    """
 
     def __init__(self, start_node, nodes):
-        self.__nodes = nodes
-
+        # setting all nodes to no distance(empty dictionary), representing infinity
         self.node_distances = {start_node: {}}
         for i in nodes:
             self.node_distances.update({i: {}})
 
-        self.priority_queue_nodes = {}
-        self._visited_nodes = []
-
-    @property
-    def visited_nodes(self):
-        return self._visited_nodes
-
-    @visited_nodes.setter
-    def visited_nodes(self, node):
-        self._visited_nodes.append(node)
-        self.update_priority_queue_nodes()
-
-    def update_priority_queue_nodes(self):
-        # lowest value first to get out
-        if self.priority_queue_nodes:
-            self.priority_queue_nodes.popitem()
-        for node_id in self.node_distances:
-            if node_id in self._visited_nodes:
-                continue
-            sum_of_values = self.add_onto(node_id)
-            if sum_of_values:
-                self.priority_queue_nodes.update({node_id: sum_of_values})
-        # sorting by value
-        self.priority_queue_nodes = {key: value for key, value in sorted(
-            self.priority_queue_nodes.items(), key=lambda item: item[1], reverse=True)}
-
-    def add_onto(self, node_id):
+    def sum_of(self, node):
         """Returns sum of values of a node in node_distances
 
-        Args:
-            node_id (<class 'points.Node'>): _description_
+        Parameters:
+            node_id (<class 'nodes.Node'>): Node to get the total sum of the distances of
 
         Returns:
-            int: _description_
+            int: total sum of the distance
         """
-        return sum(self.node_distances[node_id].values())
-
-    @property
-    def count_of_objects(self):
-        return len(self.__nodes) + 1
+        return sum(self.node_distances[node].values())
 
 
 def dijkstra(start, *nodes):
+    """Dijkstra algorithm using priority queue for Node class
 
-    nodes_object = Graph(start, nodes)
+    Parameters:
+        start (<class 'nodes.Node'>): starting node
+        nodes (<class 'nodes.Node'>): all other nodes(as many as you want)
+    """
+    # initializing priority queue
+    to_be_visited = PriorityQueue()
+
+    # initializing graph
+    graph = Graph(start, nodes)
+
+    # initializing distances from start
     for j in start.relations:
-        nodes_object.node_distances[j].update(
+        graph.node_distances[j].update(
             {start: start.relations[j]})
-    nodes_object.visited_nodes = start
+        to_be_visited.put(j, graph.sum_of(j))
 
-    while len(nodes_object.visited_nodes) != nodes_object.count_of_objects:
-        for node in nodes:
-            # choosing node that has highest priority(lowest distance) and that is also not already visited
-            if nodes_object.priority_queue_nodes and node == list(nodes_object.priority_queue_nodes)[-1]:
-                for neighbour in node.relations:
-                    add_on = nodes_object.add_onto(neighbour)
-                    if neighbour == start:
-                        continue
-                    elif nodes_object.node_distances[neighbour] == {}:
-                        nodes_object.node_distances[neighbour].update(
-                            nodes_object.node_distances[node])
-                        nodes_object.node_distances[neighbour].update(
-                            {node: node.relations[neighbour]})
-                    # if total distance to current neighbour of current node is lower than distance to current neighbour of previous node
-                    elif node.relations[neighbour] + nodes_object.add_onto(node) < add_on:
-                        nodes_object.node_distances[neighbour].clear()
-                        nodes_object.node_distances[neighbour].update(
-                            nodes_object.node_distances[node])
-                        nodes_object.node_distances[neighbour].update(
-                            {node: node.relations[neighbour]})
-                nodes_object.visited_nodes = node
+    # exit loop when priority queue is empty, all nodes are visited
+    while not to_be_visited.empty():
 
-    print(nodes_object.node_distances)
+        # choosing node that has highest priority(lowest distance) and that is also not already visited
+        current_node = to_be_visited.get()[0]
+        # looping over neighbours of current(lowest distance) node
+        for current_neighbour in current_node.relations:
+            # if neighbour is starting point
+            if current_neighbour == start:
+                continue
+
+            # if neighbour has no distances yet
+            elif graph.node_distances[current_neighbour] == {}:
+                updater(to_be_visited, graph, current_node, current_neighbour)
+
+            # if total distance to current neighbour of current node is lower than distance to current neighbour of previous node
+            elif current_node.relations[current_neighbour] + graph.sum_of(current_node) < graph.sum_of(current_neighbour):
+                updater(to_be_visited, graph, current_node, current_neighbour)
+
+    return graph.node_distances
+
+
+def updater(priority_queue, graph, current_node, current_neighbour):
+    """updating values of graph
+
+    Parameters:
+        priority_queue (<class 'priority_queue.PriorityQueue'>): priority queue
+        graph (<class 'dijkstra.Graph'>): graph
+        current_node (<class 'nodes.Node'>): current node
+        current_neighbour (<class 'nodes.Node'>): current neighbour
+    """
+    graph.node_distances[current_neighbour].clear()
+    graph.node_distances[current_neighbour].update(
+        graph.node_distances[current_node])
+    graph.node_distances[current_neighbour].update(
+        {current_node: current_node.relations[current_neighbour]})
+    priority_queue.put(
+        current_neighbour, graph.sum_of(current_neighbour))

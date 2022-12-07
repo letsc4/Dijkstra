@@ -1,14 +1,14 @@
-import points
-import dijkstra
+from nodes import Node
+from dijkstra import dijkstra
 
 
 def main():
-    a = points.Node("a")
-    b = points.Node("b")
-    c = points.Node("c")
-    d = points.Node("d")
-    e = points.Node("e")
-    f = points.Node("f")
+    a = Node("a")
+    b = Node("b")
+    c = Node("c")
+    d = Node("d")
+    e = Node("e")
+    f = Node("f")
 
     a_relations = {b: 7, c: 9, f: 14}
     b_relations = {a: 7, c: 10, d: 15}
@@ -31,7 +31,8 @@ def main():
     print(e, e.relations)
     print(f, f.relations)
 
-    dijkstra.dijkstra(a, b, c, d, e, f)
+    result = dijkstra(a, b, c, d, e, f)
+    print(result)
 
 
 if __name__ == '__main__':
