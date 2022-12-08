@@ -24,7 +24,7 @@ class Graph():
 
 
 def updater(priority_queue, graph, current_node, current_neighbour):
-    """updating values of graph with current node and neighbour
+    """updating values of graph
 
     Parameters:
         priority_queue (<class 'priority_queue.PriorityQueue'>): priority queue
