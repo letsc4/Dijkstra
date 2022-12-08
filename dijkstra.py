@@ -23,6 +23,31 @@ class Graph():
         return sum(self.node_distances[node].values())
 
 
+def updater(priority_queue, graph, current_node, current_neighbour):
+    """updating values of graph
+
+    Parameters:
+        priority_queue (<class 'priority_queue.PriorityQueue'>): priority queue
+        graph (<class 'dijkstra.Graph'>): graph
+        current_node (<class 'nodes.Node'>): current node
+        current_neighbour (<class 'nodes.Node'>): current neighbour
+    """
+    # clear current values for neighbour
+    graph.node_distances[current_neighbour].clear()
+
+    # update with the values of the current node; the way to the current node
+    graph.node_distances[current_neighbour].update(
+        graph.node_distances[current_node])
+
+    # update with the values to the current neighbour; the way to the current neighbour
+    graph.node_distances[current_neighbour].update(
+        {current_node: current_node.relations[current_neighbour]})
+
+    # update priority queue with new neighbour
+    priority_queue.put(
+        current_neighbour, graph.sum_of(current_neighbour))
+
+
 def dijkstra(start, *nodes):
     """Dijkstra algorithm using priority queue for Node class
 
@@ -62,21 +87,3 @@ def dijkstra(start, *nodes):
                 updater(to_be_visited, graph, current_node, current_neighbour)
 
     return graph.node_distances
-
-
-def updater(priority_queue, graph, current_node, current_neighbour):
-    """updating values of graph
-
-    Parameters:
-        priority_queue (<class 'priority_queue.PriorityQueue'>): priority queue
-        graph (<class 'dijkstra.Graph'>): graph
-        current_node (<class 'nodes.Node'>): current node
-        current_neighbour (<class 'nodes.Node'>): current neighbour
-    """
-    graph.node_distances[current_neighbour].clear()
-    graph.node_distances[current_neighbour].update(
-        graph.node_distances[current_node])
-    graph.node_distances[current_neighbour].update(
-        {current_node: current_node.relations[current_neighbour]})
-    priority_queue.put(
-        current_neighbour, graph.sum_of(current_neighbour))
