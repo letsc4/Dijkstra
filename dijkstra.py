@@ -23,7 +23,7 @@ class Graph():
         return sum(self.node_distances[node].values())
 
 
-def updater(priority_queue, graph, current_node, current_neighbour):
+def update_graph(priority_queue, graph, current_node, current_neighbour):
     """updating values of graph with current node and neighbour
 
     Parameters:
@@ -78,12 +78,11 @@ def dijkstra(start, *nodes):
             if current_neighbour == start:
                 continue
 
-            # if neighbour has no distances yet
-            elif graph.node_distances[current_neighbour] == {}:
-                updater(to_be_visited, graph, current_node, current_neighbour)
-
-            # if total distance to current neighbour of current node is lower than distance to current neighbour of previous node
-            elif current_node.relations[current_neighbour] + graph.sum_of(current_node) < graph.sum_of(current_neighbour):
-                updater(to_be_visited, graph, current_node, current_neighbour)
+            # if neighbour has no distances yet or if total distance to current neighbour of current node is lower than distance to current neighbour of previous node
+            elif graph.node_distances[current_neighbour] == {} or current_node.relations[current_neighbour] + graph.sum_of(current_node) < graph.sum_of(current_neighbour):
+                update_graph(graph, current_node, current_neighbour)
+                # update priority queue with new neighbour
+                to_be_visited.put(
+                    current_neighbour, graph.sum_of(current_neighbour))
 
     return graph.node_distances
