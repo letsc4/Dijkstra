@@ -23,11 +23,10 @@ class Graph():
         return sum(self.node_distances[node].values())
 
 
-def update_graph(priority_queue, graph, current_node, current_neighbour):
+def update_graph(graph, current_node, current_neighbour):
     """updating values of graph with current node and neighbour
 
     Parameters:
-        priority_queue (<class 'priority_queue.PriorityQueue'>): priority queue
         graph (<class 'dijkstra.Graph'>): graph
         current_node (<class 'nodes.Node'>): current node
         current_neighbour (<class 'nodes.Node'>): current neighbour
@@ -42,10 +41,6 @@ def update_graph(priority_queue, graph, current_node, current_neighbour):
     # update with the values to the current neighbour; the way to the current neighbour
     graph.node_distances[current_neighbour].update(
         {current_node: current_node.relations[current_neighbour]})
-
-    # update priority queue with new neighbour
-    priority_queue.put(
-        current_neighbour, graph.sum_of(current_neighbour))
 
 
 def dijkstra(start, *nodes):
