@@ -58,8 +58,7 @@ def dijkstra(start, *nodes):
 
     # initializing distances from start
     for j in start.relations:
-        graph.node_distances[j].update(
-            {start: start.relations[j]})
+        update_graph(graph, start, j)
         to_be_visited.put(j, graph.sum_of(j))
 
     # exit loop when priority queue is empty, all nodes are visited
