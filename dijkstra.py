@@ -43,7 +43,7 @@ def update_graph(graph, current_node, current_neighbour):
         {current_node: current_node.relations[current_neighbour]})
 
 
-def dijkstra(start, *nodes, end_node=""):
+def dijkstra(start, *nodes):
     """Dijkstra algorithm using priority queue for Node class
 
     Parameters:
@@ -56,8 +56,10 @@ def dijkstra(start, *nodes, end_node=""):
     # initializing graph
     graph = Graph(start, nodes)
 
-    # put start node in priority queue
-    to_be_visited.put(start, 0)
+    # initializing distances from start
+    for j in start.relations:
+        update_graph(graph, start, j)
+        to_be_visited.put(j, graph.sum_of(j))
 
     # exit loop when priority queue is empty, all nodes are visited
     while not to_be_visited.empty():
@@ -76,9 +78,5 @@ def dijkstra(start, *nodes, end_node=""):
                 # update priority queue with new neighbour
                 to_be_visited.put(
                     current_neighbour, graph.sum_of(current_neighbour))
-
-        # if end node has been visited exit the loop early
-        if current_node == end_node:
-            break
 
     return graph.node_distances
