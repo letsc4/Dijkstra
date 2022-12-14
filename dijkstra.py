@@ -49,6 +49,10 @@ def dijkstra(start, *nodes, end_node=False):
     Parameters:
         start (<class 'nodes.Node'>): starting node
         nodes (<class 'nodes.Node'>): all other nodes(as many as you want)
+        end_node (<class 'nodes.Node'>, optional): _description_. Defaults to False.
+
+    Returns:
+        dict: shortest distances to nodes
     """
     # initializing priority queue
     to_be_visited = PriorityQueue()
